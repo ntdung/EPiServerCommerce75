@@ -9,6 +9,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Interactions;
+using OpenQA.Selenium.Support.UI;
 
 namespace EPiServerCommerce75
 {
@@ -21,7 +22,7 @@ namespace EPiServerCommerce75
         {
             var builder = new OpenQA.Selenium.Interactions.Actions(driver);
             try
-            {
+            {  
                 builder.MoveToElement(targetElement).Build().Perform();
                 Thread.Sleep(2000);//2 sec is just to for this blog.
                 //I use custome method to wait element being appeared after mouse hover event.
@@ -112,6 +113,83 @@ namespace EPiServerCommerce75
                 driver.FindElement(By.XPath("//div[contains(@class, 'btn-group')]//a[@href='/en/departmental-catalog/Departments/Fashion/Tops/Tops-Tunics/Tops-Tunics-CowlNeck/']/following::div//a[contains(@id, 'btnAddToCart')]"));
                 
             link3.Click();
+
+            driver.FindElement(By.Id("MainContent_CartSimpleModuleID_ContinueButton")).Click();
+
+            driver.FindElement(By.XPath("//div[@class='btn-group']//a[@href='/en/departmental-catalog/Departments/Fashion/Tops/Tops-Tunics/Tops-Tunics-LongSleeve/']/following-sibling::a[1]")).Click();
+
+            driver.FindElement(By.XPath("//div[contains(@class, 'btn-group')]//a[@href='/en/departmental-catalog/Departments/Fashion/Tops/Tops-Tunics/Tops-Tunics-LongSleeve/']/following::div//a[contains(@id, 'btnAddToCart')]")).Click();
+            ClickProceedToCheckout();
+            ClickSingleShipment();
+            EnterNewBillAddress();
+            //
+        }
+
+        private static void ClickProceedToCheckout()
+        {
+            driver.FindElement(By.Id("MainContent_CartSimpleModuleID_goToCheckout")).Click();
+        }
+
+        private static void ClickSingleShipment()
+        {
+            driver.FindElement(By.XPath("//a[@href='/en/Checkout/Single-Shipment-Checkout/']")).Click();
+        }
+
+        private static void EnterNewBillAddress()
+        {
+            driver.FindElement(By.XPath("//strong[contains(text(), 'Bill To:')]//parent::*//parent::*//a[@class='btn btn-info dropdown-toggle']")).Click();
+
+            driver.FindElement(By.XPath("//strong[contains(text(), 'Bill To:')]//parent::*//parent::*//a[text()='Creating a New Address']")).Click();
+            
+            Thread.Sleep(2000);
+            
+            driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_Name")).SendKeys("NNPT");
+
+            driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_FirstName")).SendKeys("Dũng");
+            driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_LastName")).SendKeys("Nguyễn");
+            driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_Email")).SendKeys("ntdung171@hotmail.com");
+            driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_Phone")).SendKeys("84986676268");
+            driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_CompanyName")).SendKeys("TVSoft Co.,Ltd");
+            driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_StreetAddress")).SendKeys("18/422 Trương Định");
+            driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_Apartment")).SendKeys("Apt");
+            driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_City")).SendKeys("Hà Nội");
+            driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_State")).SendKeys("N/A");
+            driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_Zip")).SendKeys("10000");
+           // driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_Country")).SendKeys("");
+            var country =
+                new SelectElement(driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_Country")));
+            country.SelectByText("Viet Nam");
+            driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_Addresses_SaveAddressButton")).Click();
+
+            Thread.Sleep(2000);
+
+            SelectExistingAddressForShipTo();
+            Thread.Sleep(2000);
+            // Verify Sub Total value
+            var subTotal = driver.FindElement(By.XPath("//h5[contains(text(),'Sub Total For Your Items')]//parent::*//following-sibling::div//strong"));
+            Console.WriteLine("Sub total: " + subTotal.Text);
+
+            //var subTotal1 = driver.FindElement(By.XPath("//h5[contains(text(),'Additional Order Level Discounts')]//parent::*//following-sibling::div//strong"));
+            //Console.WriteLine("Additional Order: " + subTotal1.Text);
+
+            var subTotal2 = driver.FindElement(By.XPath("//h5[contains(text(),'Sub Total For Your Cart/Order')]//parent::*//following-sibling::div//h5"));
+            Console.WriteLine("Sub Total For Your Cart/Order: " + subTotal2.Text);
+
+            var subTotal3 = driver.FindElement(By.XPath("//div[contains(text(),'Estimated Shipping Costs')]//following-sibling::div//strong"));
+            Console.WriteLine("Estimated Shipping: " + subTotal3.Text);
+
+            var subTotal4 = driver.FindElement(By.XPath("//div[contains(text(),'Estimated Tax to Be Collected')]//following-sibling::div//strong"));
+            Console.WriteLine("Estimated Tax: " + subTotal4.Text);
+            
+            /* Click Place Order */
+            driver.FindElement(By.Id("MainContent_SingleShipmentCheckoutID_CheckoutButton")).Click();
+        }
+
+        private static void SelectExistingAddressForShipTo()
+        {
+            driver.FindElement(By.XPath("//strong[contains(text(), 'Ship To:')]//parent::*//parent::*//a[text()='Use Address Book']")).Click();
+            Thread.Sleep(1000);
+            driver.FindElement(By.XPath("//div[@id='select-existing-address' and contains(@style, 'block')]//a[text()='NNPT']")).Click();
         }
         static void Main(string[] args)
         {
