@@ -13,11 +13,12 @@ using OpenQA.Selenium.Support.UI;
 
 namespace EPiServerCommerce75
 {
-    class Program
+    public class Program
     {
         private static IWebDriver driver = null;
         private static string baseURL = "http://netfocus:17000";
 
+        
         public static bool ElementMouseOver(IWebElement targetElement)
         {
             var builder = new OpenQA.Selenium.Interactions.Actions(driver);
@@ -38,29 +39,108 @@ namespace EPiServerCommerce75
             return true;
         }
 
-        static void TestExpanCollaspOnTop()
+        static bool NavigationDropDownIsActive()
         {
-            var divExpand = driver.FindElement(By.XPath("//div[@class='epi-navigation-expandcollapseContainer']"));
-            var link = divExpand.FindElement(By.XPath(".//a"));
+            driver.FindElement(
+                By.XPath("//div[@id='globalMenuContainer']"));
+            var accordionNode =
+                driver.FindElement(
+                    By.XPath("//div[@id='globalMenuContainer']/div[1]"));
+            if (accordionNode.GetAttribute("style").Contains("height: 0px;"))
+            {
+                OpenGlobalMenu();
+            }
+            //var navi = driver.FindElement(By.CssSelector("div#globalMenuContainer > div.epi-navigation-container1"));
+            var navigationDropDown = driver.FindElement(
+                    By.XPath("//div[@id='globalMenuContainer']//div[@class='epi-navigation-container1']//li[contains(@class, 'epi-navigation-dropdown')]"), 5);
+            
+            return (navigationDropDown.GetAttribute("style").Contains("display: block"));
+        }
 
+
+        static void OpenGlobalMenu()
+        {
+            var link = driver.FindElement(By.XPath("//div[@id='globalMenuContainer']//a"), 5);
+         
             Actions actions2 = new Actions(driver);
             actions2.MoveToElement(link);
             actions2.Click().Perform();
-
-            Thread.Sleep(3000);
-            var adminLink = driver.FindElement(By.XPath("//a[@class='epi-navigation-global_cms_admin ']"));
-            actions2.MoveToElement(adminLink);
-            actions2.Click().Perform();
-
-            driver.SwitchTo().Frame("FullRegion_AdminMenu");
-
-            driver.FindElement(By.LinkText("Content Type")).Click();
-
-            driver.FindElement(By.LinkText("Create New Page Type")).Click();
+            
             //var contentTypeTab = driver.FindElement(By.LinkText("Content Type"));
             //actions2.MoveToElement(contentTypeTab);
             //actions2.Click().Perform();
+        }
 
+        static void NavigateToNewCatalogUI()
+        {
+            OpenGlobalMenu();
+            Thread.Sleep(2000);
+            if (NavigationDropDownIsActive())
+            {
+                // Open drop down menu
+                driver.FindElement(
+                    By.XPath(
+                        "//div[@id='globalMenuContainer']/div[@class='epi-navigation-accordioncontainer']/div[@class='epi-navigation-container1']/a[@href='#global_more_sub']"), 5)
+                    .Click();
+
+                driver.FindElement(
+                    By.XPath(
+                        "div[@class, 'epi-navigation-more-items-wrapper epi-contextMenu']/a[@href='#global_Commerce_sub']"), 5)
+                    .Click();
+
+                OpenGlobalMenu();
+            }
+            else
+            {
+                var commerceLink = driver.FindElement(
+                    By.XPath(
+                        "//div[@id='globalMenuContainer']//div[contains(@class, 'epi-navigation-accordioncontainer')]//div[@class='epi-navigation-container1']//span[text()='Commerce']"), 5);
+                var actions = new Actions(driver);
+                actions.MoveToElement(commerceLink);
+                actions.Click();
+                actions.Perform();
+            }
+            
+            //epi-navigation-container2 div
+            //global_Commerce_sub ul
+            var catalogLink = driver.FindElement(
+                    By.XPath("//div[@id='globalMenuContainer']//div[contains(@class, 'epi-navigation-accordioncontainer')]//div[@class='epi-navigation-container2']//ul[@id='global_Commerce_sub']//a[text()='Catalog']"), 5);
+            var actionCatalog = new Actions(driver);
+            actionCatalog.MoveToElement(catalogLink);
+            actionCatalog.Click();
+            actionCatalog.Perform();
+        }
+
+        static void ToggleNavigationPan()
+        {
+            var span = driver.FindElement(By.XPath("//div[@id='applicationContainer']//div[@id='/episerver/commerce/catalog_rootContainer']//div[@class='dijit epi-globalToolbar dijitToolbar']//span[@class='dijitReset dijitInline dijitButtonNode']"), 5);
+
+            var actionPan = new Actions(driver);
+            actionPan.MoveToElement(span);
+            actionPan.Click();
+            actionPan.Perform();
+
+            var pin = driver.FindElement(
+                By.XPath(
+                    "//div[@id='navigation']//div[@class='epi-pinnableToolbar']//div[@class='epi-toolbarGroup epi-toolbarTrailing']/span[2]//span[@class='dijitReset dijitInline dijitButtonNode']"), 5);
+            var actionPin = new Actions(driver);
+            actionPin.MoveToElement(pin);
+            actionPin.Click();
+            actionPin.Perform();
+        }
+        static void NavigateToCmsEditor()
+        {
+            OpenGlobalMenu();
+
+            //var adminLink = driver.FindElement(By.XPath("//a[@class='epi-navigation-global_cms_admin ']"));
+            //actions2.MoveToElement(adminLink);
+            //actions2.Click().Perform();
+
+            //driver.SwitchTo().Frame("FullRegion_AdminMenu");
+
+            //driver.FindElement(By.LinkText("Content Type")).Click();
+
+            //driver.FindElement(By.LinkText("Create New Page Type")).Click();
         }
 
         private static void Logout()
@@ -85,7 +165,6 @@ namespace EPiServerCommerce75
         {
             driver.FindElement(By.Id("epi-quickNavigator-clickHandler")).Click();
             driver.FindElement(By.LinkText("CMS Edit")).Click();
-            Thread.Sleep(5000);
         }
 
         private static void PlaceOrder()
@@ -191,6 +270,49 @@ namespace EPiServerCommerce75
             Thread.Sleep(1000);
             driver.FindElement(By.XPath("//div[@id='select-existing-address' and contains(@style, 'block')]//a[text()='NNPT']")).Click();
         }
+
+        private static void ExpandCatalogRoot()
+        {
+            var expandNode = driver.FindElement(By.XPath("//div[@id='navigation']//span[text()='Catalog Root']//preceding-sibling::span[contains(@class, 'dijitTreeExpando')]"), 5);
+            if (expandNode.GetAttribute("class").Contains("dijitTreeExpandoClosed"))
+            {
+                var actions = new Actions(driver);
+                actions.MoveToElement(expandNode);
+                actions.Click();
+                actions.Perform();
+            }
+        }
+
+        private static void ExpandCategory(string category)
+        {
+            var expandNode = driver.FindElement(By.XPath("//div[@id='navigation']//span[text()='" + category + "']//preceding-sibling::span[contains(@class, 'dijitTreeExpando')]"), 5);
+            if (expandNode.GetAttribute("class").Contains("dijitTreeExpandoClosed"))
+            {
+                var actions = new Actions(driver);
+                actions.MoveToElement(expandNode);
+                actions.Click();
+                actions.Perform();
+                Thread.Sleep(2000);
+            }
+        }
+
+        private static void ExpandCategory(IEnumerable<string> categories)
+        {
+            foreach (var category in categories)
+            {
+                ExpandCategory(category);
+            }
+        }
+
+        private static void ClickCategoryTree(string category)
+        {
+            var expandNode = driver.FindElement(By.XPath("//div[@id='navigation']//span[text()='" + category + "']/parent::*/parent::*"), 5);
+            Console.WriteLine(expandNode.GetAttribute("class"));
+            var actions = new Actions(driver);
+            actions.MoveToElement(expandNode);
+            actions.Click();
+            actions.Perform();
+        }
         static void Main(string[] args)
         {
             driver = new ChromeDriver();
@@ -201,7 +323,26 @@ namespace EPiServerCommerce75
             driver.Navigate().GoToUrl(baseURL + "/");
             
             Login();
-            PlaceOrder();
+            
+            Thread.Sleep(2000);
+            driver.FindElement(By.Id("epi-quickNavigator-clickHandler")).Click();
+            Thread.Sleep(1000);
+            //driver.FindElement(By.XPath("//ul[@id='epi-quickNavigator']//li[@class='epi-quickNavigator-dropdown']//ul[@id='epi-quickNavigator-menu']//a[text()='Commerce Catalog']")).Click();
+            driver.FindElement(By.XPath("//ul[@id='epi-quickNavigator']//li[@class='epi-quickNavigator-dropdown']//ul[@id='epi-quickNavigator-menu']//a[text()='CMS Edit']")).Click();
+
+            Thread.Sleep(2000);
+            NavigateToNewCatalogUI();
+
+            Thread.Sleep(2000);
+
+            ToggleNavigationPan();
+            //ExpandCatalogRoot();
+            ExpandCategory(
+            new string[]{
+                "Catalog Root", "Departmental Catalog", "Departments", "Fashion", "Bottoms", 
+            });
+            ClickCategoryTree("Bottoms-Skirts");
+            //PlaceOrder();
             
             
             //var ul = driver.FindElement(By.Id("epi-quickNavigator-menu"));
@@ -220,7 +361,7 @@ namespace EPiServerCommerce75
             //Console.WriteLine(cmsEditLink.Location);
             
             
-            //TestExpanCollaspOnTop();
+            //OpenGlobalMenu();
             return;
             
             var span = driver.FindElement(By.Id("uniqName_26_46"));
