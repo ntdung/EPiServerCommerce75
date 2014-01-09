@@ -286,13 +286,18 @@ namespace EPiServerCommerce75
         private static void ExpandCategory(string category)
         {
             var expandNode = driver.FindElement(By.XPath("//div[@id='navigation']//span[text()='" + category + "']//preceding-sibling::span[contains(@class, 'dijitTreeExpando')]"), 5);
+            
             if (expandNode.GetAttribute("class").Contains("dijitTreeExpandoClosed"))
             {
                 var actions = new Actions(driver);
                 actions.MoveToElement(expandNode);
                 actions.Click();
                 actions.Perform();
-                Thread.Sleep(2000);
+                Thread.Sleep(500);
+                while (driver.FindElement(By.XPath("//div[@id='navigation']//span[text()='" + category + "']//preceding-sibling::span[contains(@class, 'dijitTreeExpando')]"), 5).GetAttribute("class").Contains("dijitTreeExpandoLoading"))
+                {
+                    Thread.Sleep(500);
+                }
             }
         }
 
@@ -312,6 +317,45 @@ namespace EPiServerCommerce75
             actions.MoveToElement(expandNode);
             actions.Click();
             actions.Perform();
+        }
+
+        private static void HoverCategoryTree(string category)
+        {
+            var expandNode = driver.FindElement(By.XPath("//div[@id='navigation']//span[text()='" + category + "']/parent::*/parent::*"), 5);
+            Console.WriteLine(expandNode.GetAttribute("class"));
+            var actions = new Actions(driver);
+            actions.MoveToElement(expandNode).Build().Perform();
+            Thread.Sleep(2000);
+            expandNode = driver.FindElement(By.XPath("//div[@id='navigation']//span[text()='" + category + "']/parent::*/parent::*"), 5);
+            Console.WriteLine(expandNode.GetAttribute("class"));
+
+            //epi-extraIcon epi-pt-contextMenu epi-iconContextMenu
+
+            var optionsMenu = driver.FindElement(By.XPath("//div[@id='navigation']//span[text()='" + category + "']/parent::*//span[contains(@class, 'epi-iconContextMenu')]"), 5);
+            actions.MoveToElement(optionsMenu).Click().Perform();
+
+            actions.MoveToElement(driver.FindElement(By.XPath("//div[contains(@class, 'dijitMenuPopup') and not(contains(@stype, 'display: none;'))]//td[text()='Edit']"), 5)).Click().Perform();
+        }
+
+        private static void Click_Tab_AllProperties(string tabName)
+        {
+            var form = driver.FindElement(By.XPath("//form[@class='epi-formArea']"), 5);
+            
+            var tab = driver.FindElement(
+                By.XPath("//form[@class='epi-formArea']//span[@class='tabLabel' and text()='" + tabName + "']"), 5);
+            Console.WriteLine(tab.FindElement(By.XPath("./parent::*")).GetAttribute("class"));
+            if (!tab.FindElement(By.XPath("./parent::*")).GetAttribute("class").Contains("dijitTabChecked dijitChecked"))
+            {
+                var actions = new Actions(driver);
+                actions.MoveToElement(tab).Click().Perform();
+            }
+
+            //All tabs (hidden or visible) are in this div @class = dijitTabPaneWrapper dijitTabContainerTop-container
+            var div = form.FindElement(By.XPath(".//div[@class='dijitTabPaneWrapper dijitTabContainerTop-container']"));
+            var visibleDiv = div.FindElement(By.XPath("./div[contains(@class, 'dijitVisible')]"));
+            Console.WriteLine("visibleDiv: " + visibleDiv.GetAttribute("class"));
+            new Actions(driver).MoveToElement(visibleDiv.FindElement(By.XPath(".//span[text()='Add Media']/parent::*/parent::*"))).Click().Perform();
+
         }
         static void Main(string[] args)
         {
@@ -338,9 +382,10 @@ namespace EPiServerCommerce75
             //ExpandCatalogRoot();
             ExpandCategory(
             new string[]{
-                "Catalog Root", "Departmental Catalog", "Departments", "Fashion", "Bottoms", 
+                "Catalog Root", "Departmental Catalog", "Departments", "Media", "Music", 
             });
-            ClickCategoryTree("Bottoms-Skirts");
+            HoverCategoryTree("Music-Soundtrack");
+            Click_Tab_AllProperties("Assets");
             //PlaceOrder();
             
             
