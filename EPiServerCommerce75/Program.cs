@@ -316,7 +316,7 @@ namespace EPiServerCommerce75
         static void Main(string[] args)
         {
             driver = new ChromeDriver();
-            //Size currentWinSize = driver.Manage().Window.Size;
+            
             driver.Manage().Window.Maximize();
 
 
@@ -327,7 +327,6 @@ namespace EPiServerCommerce75
             Thread.Sleep(2000);
             driver.FindElement(By.Id("epi-quickNavigator-clickHandler")).Click();
             Thread.Sleep(1000);
-            //driver.FindElement(By.XPath("//ul[@id='epi-quickNavigator']//li[@class='epi-quickNavigator-dropdown']//ul[@id='epi-quickNavigator-menu']//a[text()='Commerce Catalog']")).Click();
             driver.FindElement(By.XPath("//ul[@id='epi-quickNavigator']//li[@class='epi-quickNavigator-dropdown']//ul[@id='epi-quickNavigator-menu']//a[text()='CMS Edit']")).Click();
 
             Thread.Sleep(2000);
