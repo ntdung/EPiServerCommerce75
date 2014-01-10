@@ -1,18 +1,31 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPiServerCommerce75", "EPiServerCommerce75\EPiServerCommerce75.csproj", "{5129A6BB-640E-408D-9265-4BA4C7D889CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomationTesting", "AutomationTesting\AutomationTesting.csproj", "{FDF8A82E-35C8-4D6E-8F4A-395F08BA8E4A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{5129A6BB-640E-408D-9265-4BA4C7D889CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5129A6BB-640E-408D-9265-4BA4C7D889CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5129A6BB-640E-408D-9265-4BA4C7D889CC}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{5129A6BB-640E-408D-9265-4BA4C7D889CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5129A6BB-640E-408D-9265-4BA4C7D889CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5129A6BB-640E-408D-9265-4BA4C7D889CC}.Release|x86.ActiveCfg = Release|Any CPU
+		{FDF8A82E-35C8-4D6E-8F4A-395F08BA8E4A}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{FDF8A82E-35C8-4D6E-8F4A-395F08BA8E4A}.Debug|Any CPU.Build.0 = Debug|x86
+		{FDF8A82E-35C8-4D6E-8F4A-395F08BA8E4A}.Debug|x86.ActiveCfg = Debug|x86
+		{FDF8A82E-35C8-4D6E-8F4A-395F08BA8E4A}.Debug|x86.Build.0 = Debug|x86
+		{FDF8A82E-35C8-4D6E-8F4A-395F08BA8E4A}.Release|Any CPU.ActiveCfg = Release|x86
+		{FDF8A82E-35C8-4D6E-8F4A-395F08BA8E4A}.Release|x86.ActiveCfg = Release|x86
+		{FDF8A82E-35C8-4D6E-8F4A-395F08BA8E4A}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
